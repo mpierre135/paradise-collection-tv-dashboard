@@ -53,7 +53,10 @@ export const unitsConfig: UnitConfig[] = [
         "linear-gradient(120deg, rgba(9,27,36,0.90), rgba(14,69,81,0.74), rgba(216,162,94,0.48))",
       backgroundImageUrl:
         "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1800&q=80"
-    }
+    },
+    instagramHandle: "poinsettiaparadise",
+    directBookingUrl: "https://paradiseftl.com",
+    directBookingPromo: "Save 10% on your next booking"
   },
   {
     id: "unit-poinsettia-2br",
@@ -83,7 +86,10 @@ export const unitsConfig: UnitConfig[] = [
         "linear-gradient(135deg, rgba(8,24,33,0.92), rgba(22,91,86,0.72), rgba(109,165,145,0.44))",
       backgroundImageUrl:
         "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1800&q=80"
-    }
+    },
+    instagramHandle: "poinsettiaparadise",
+    directBookingUrl: "https://paradiseftl.com",
+    directBookingPromo: "Save 10% on your next booking"
   },
   {
     id: "unit-poinsettia-1br",
@@ -113,7 +119,10 @@ export const unitsConfig: UnitConfig[] = [
         "linear-gradient(120deg, rgba(10,28,37,0.90), rgba(20,84,95,0.70), rgba(242,196,142,0.40))",
       backgroundImageUrl:
         "https://images.unsplash.com/photo-1464890100898-a385f744067f?auto=format&fit=crop&w=1800&q=80"
-    }
+    },
+    instagramHandle: "poinsettiaparadise",
+    directBookingUrl: "https://paradiseftl.com",
+    directBookingPromo: "Save 10% on your next booking"
   }
 ];
 

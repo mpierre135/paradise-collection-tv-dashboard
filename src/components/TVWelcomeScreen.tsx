@@ -150,7 +150,36 @@ export function TVWelcomeScreen({
           <p className="text-lg text-white/80">
             Thank you for staying with The Paradise Collection. Relax, unwind, and enjoy your South Florida escape.
           </p>
-          <p className="mt-1 text-sm text-white/50">Page refreshes in {refreshCountdown}</p>
+          {(unit.instagramHandle || unit.directBookingUrl) ? (
+            <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-lg">
+              {unit.instagramHandle ? (
+                <a
+                  href={`https://instagram.com/${unit.instagramHandle.replace(/^@/, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-white/90 underline decoration-white/40 underline-offset-2 hover:text-white"
+                >
+                  Follow @{unit.instagramHandle.replace(/^@/, "")} on Instagram
+                </a>
+              ) : null}
+              {unit.directBookingUrl ? (
+                <span className="text-white/85">
+                  <a
+                    href={unit.directBookingUrl.startsWith("http") ? unit.directBookingUrl : `https://${unit.directBookingUrl}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-white/90 underline decoration-white/40 underline-offset-2 hover:text-white"
+                  >
+                    Book direct at {unit.directBookingUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+                  </a>
+                  {unit.directBookingPromo ? (
+                    <span className="ml-2 text-[#bfe0d8]">— {unit.directBookingPromo}</span>
+                  ) : null}
+                </span>
+              ) : null}
+            </div>
+          ) : null}
+          <p className="mt-2 text-sm text-white/50">Page refreshes in {refreshCountdown}</p>
         </footer>
       </div>
     </main>

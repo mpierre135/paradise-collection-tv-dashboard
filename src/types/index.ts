@@ -49,6 +49,9 @@ export type UnitConfig = {
   upsellIds: string[];
   recommendationIds: string[];
   theme: UnitTheme;
+  instagramHandle?: string;
+  directBookingUrl?: string;
+  directBookingPromo?: string;
 };
 
 export type NormalizedBooking = {
