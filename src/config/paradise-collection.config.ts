@@ -105,8 +105,8 @@ export const unitsConfig: UnitConfig[] = [
     timezone: "America/New_York",
     latitude: 26.1228,
     longitude: -80.1364,
-    lodgifyPropertyId: 504694,
-    lodgifyRoomTypeId: 504694,
+    lodgifyPropertyId: 571049,
+    lodgifyRoomTypeId: 571049,
     lodgifyIcalUrl:
       "https://www.lodgify.com/c0faf222-8ef2-4881-be06-2d9ffbeec849.ics",
     wifiName: "Poinsettia Paradise 5GHz ",
