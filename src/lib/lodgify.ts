@@ -12,7 +12,7 @@ import { cleanWhitespace, toTitleCase } from "@/src/lib/formatters";
 
 const LODGIFY_API_BASE = "https://api.lodgify.com/v2";
 
-/** Lodgify API reservation item. Handles v1 (arrival/departure) and v2 (check_in/check_out) shapes. */
+/** Lodgify API reservation item (v2 /reservations/bookings shape). */
 type LodgifyReservationItem = {
   arrival?: string;
   departure?: string;
@@ -21,6 +21,9 @@ type LodgifyReservationItem = {
   checkIn?: string;
   checkOut?: string;
   status?: string;
+  property_id?: number;
+  room_type_id?: number;
+  roomTypeId?: number;
   guest?: {
     first_name?: string;
     last_name?: string;
@@ -82,13 +85,24 @@ export async function getActiveBookingFromApi(
   apiKey: string,
   checkoutTime: string,
   timezone?: string,
-  now = new Date()
+  now = new Date(),
+  roomTypeId?: number
 ): Promise<NormalizedBooking> {
   const tz = resolveTimezone(timezone);
 
   try {
+    // Request a window around today to avoid fetching all-time bookings
+    const windowStart = new Date(now);
+    windowStart.setDate(windowStart.getDate() - 1);
+    const windowEnd = new Date(now);
+    windowEnd.setDate(windowEnd.getDate() + 30);
+    const fmt = (d: Date) => d.toISOString().slice(0, 10);
+
     const url = new URL(`${LODGIFY_API_BASE}/reservations/bookings`);
     url.searchParams.set("property_id", String(propertyId));
+    url.searchParams.set("start_date", fmt(windowStart));
+    url.searchParams.set("end_date", fmt(windowEnd));
+    url.searchParams.set("size", "50");
 
     const response = await fetch(url.toString(), {
       headers: {
@@ -103,9 +117,9 @@ export async function getActiveBookingFromApi(
     }
 
     const body = (await response.json()) as LodgifyReservationsResponse | LodgifyReservationItem[];
-    // Log raw response shape to Vercel function logs so we can see exact field names
-    console.log("[Lodgify API] raw response keys:", JSON.stringify(Object.keys(body as object)));
-    console.log("[Lodgify API] raw body:", JSON.stringify(body).slice(0, 2000));
+    console.log("[Lodgify API] propertyId:", propertyId, "roomTypeId:", roomTypeId);
+    console.log("[Lodgify API] raw body:", JSON.stringify(body).slice(0, 3000));
+
     const list = Array.isArray(body)
       ? body
       : (body.data ?? body.items ?? body.reservations ?? []);
@@ -119,15 +133,25 @@ export async function getActiveBookingFromApi(
     const getDeparture = (r: LodgifyReservationItem) =>
       parseLodgifyDate(r.departure ?? r.check_out ?? r.checkOut);
 
+    const getRoomTypeId = (r: LodgifyReservationItem): number | undefined => {
+      const v = r.room_type_id ?? r.roomTypeId;
+      return typeof v === "number" ? v : undefined;
+    };
+
     const nowTime = now.getTime();
     const active = list
       .filter((r) => {
+        // If we know the room type ID, only match bookings for this unit
+        if (roomTypeId !== undefined) {
+          const rid = getRoomTypeId(r);
+          if (rid !== undefined && rid !== roomTypeId) return false;
+        }
         const status = (r.status ?? "").toString();
         if (BLOCKED_STATUSES.some((s) => status.toLowerCase().includes(s.toLowerCase()))) return false;
         const arrival = getArrival(r);
         const departure = getDeparture(r);
         if (!arrival || !departure) return false;
-        // Use end-of-checkout-day so guests still see their screen on checkout day
+        // Include full checkout day
         return nowTime >= arrival.getTime() && nowTime < departure.getTime() + 24 * 60 * 60 * 1000;
       })
       .sort((a, b) => {
@@ -137,19 +161,17 @@ export async function getActiveBookingFromApi(
       })[0];
 
     if (!active) {
-      console.log("[Lodgify API] no active reservation found among", list.length, "items");
+      console.log("[Lodgify API] no active reservation for propertyId:", propertyId, "roomTypeId:", roomTypeId, "total items:", list.length);
       return buildEmptyBooking();
     }
 
     const arrival = getArrival(active);
     const departure = getDeparture(active);
-    if (!arrival || !departure) {
-      return buildEmptyBooking();
-    }
+    if (!arrival || !departure) return buildEmptyBooking();
 
     const guestFirstName = guestFirstNameFromApi(active);
-    console.log("[Lodgify API] active reservation keys:", JSON.stringify(Object.keys(active)));
-    console.log("[Lodgify API] active.guest:", JSON.stringify(active.guest));
+    console.log("[Lodgify API] active keys:", JSON.stringify(Object.keys(active)));
+    console.log("[Lodgify API] active.room_type_id:", active.room_type_id, "guest_name:", active.guest_name, "guest:", JSON.stringify(active.guest));
     console.log("[Lodgify API] resolved guestFirstName:", guestFirstName);
     return toNormalizedBooking(arrival, departure, guestFirstName, checkoutTime, tz, now);
   } catch (error) {

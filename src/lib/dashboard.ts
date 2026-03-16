@@ -30,7 +30,7 @@ export async function getDashboardDataBySlug(slug: string): Promise<DashboardWit
   const bookingPromise = isMockDataEnabled()
     ? Promise.resolve(normalizeMockBooking(getMockBookings(now)[unit.id], unit.checkoutTime, unit.timezone, now))
     : useApi
-      ? getActiveBookingFromApi(unit.lodgifyPropertyId!, apiKey!, unit.checkoutTime, unit.timezone, now)
+      ? getActiveBookingFromApi(unit.lodgifyPropertyId!, apiKey!, unit.checkoutTime, unit.timezone, now, unit.lodgifyRoomTypeId)
       : getActiveBookingFromIcal(unit.lodgifyIcalUrl, unit.checkoutTime, unit.timezone, now);
 
   const weatherPromise = isMockDataEnabled()

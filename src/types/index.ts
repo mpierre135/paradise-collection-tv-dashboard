@@ -37,8 +37,10 @@ export type UnitConfig = {
   timezone: string;
   latitude: number;
   longitude: number;
-  /** Lodgify property ID for API (optional). When set with LODGIFY_API_KEY, reservations are fetched via API instead of iCal. */
+  /** Lodgify property ID (the parent "house") — used as property_id in API calls. */
   lodgifyPropertyId?: number;
+  /** Lodgify room type ID for this specific unit — used to filter bookings when the property has multiple room types. */
+  lodgifyRoomTypeId?: number;
   lodgifyIcalUrl: string;
   wifiName: string;
   wifiPassword: string;
