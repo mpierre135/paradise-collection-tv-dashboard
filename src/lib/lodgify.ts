@@ -12,12 +12,18 @@ import { cleanWhitespace, toTitleCase } from "@/src/lib/formatters";
 
 const LODGIFY_API_BASE = "https://api.lodgify.com/v1";
 
-/** Lodgify API reservation item (guest, arrival, departure). */
+/** Lodgify API reservation item (guest, arrival, departure). API may use snake_case or camelCase. */
 type LodgifyReservationItem = {
   arrival?: string;
   departure?: string;
   status?: string;
-  guest?: { first_name?: string; last_name?: string; name?: string };
+  guest?: {
+    first_name?: string;
+    last_name?: string;
+    name?: string;
+    firstName?: string;
+    lastName?: string;
+  };
   [key: string]: unknown;
 };
 
@@ -36,11 +42,33 @@ function parseLodgifyDate(value: string | undefined): Date | null {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
-function guestFirstNameFromApi(guest: LodgifyReservationItem["guest"]): string | null {
-  if (!guest || typeof guest !== "object") return null;
-  const first = guest.first_name ?? (typeof guest.name === "string" ? guest.name.split(" ")[0] : null);
-  const trimmed = typeof first === "string" ? first.trim() : null;
-  return trimmed && trimmed.length > 0 ? toTitleCase(trimmed) : null;
+function guestFirstNameFromApi(reservation: LodgifyReservationItem): string | null {
+  const r = reservation as Record<string, unknown>;
+
+  const fromGuest = (g: unknown): string | null => {
+    if (!g || typeof g !== "object") return null;
+    const o = g as Record<string, unknown>;
+    const first =
+      (o.first_name as string) ??
+      (o.firstName as string) ??
+      (typeof o.name === "string" ? o.name.split(/\s+/)[0] : null);
+    const trimmed = typeof first === "string" ? first.trim() : null;
+    return trimmed && trimmed.length > 0 ? toTitleCase(trimmed) : null;
+  };
+
+  const fromNameString = (name: unknown): string | null => {
+    const s = typeof name === "string" ? name.trim() : null;
+    if (!s) return null;
+    const first = s.split(/\s+/)[0];
+    return first && first.length > 0 ? toTitleCase(first) : null;
+  };
+
+  return (
+    fromGuest(reservation.guest) ??
+    fromGuest(r.primary_guest) ??
+    fromGuest(Array.isArray(r.guests) ? r.guests[0] : null) ??
+    fromNameString(r.guest_name ?? r.guestName ?? r.contact_name ?? r.name)
+  );
 }
 
 export async function getActiveBookingFromApi(
@@ -103,7 +131,7 @@ export async function getActiveBookingFromApi(
       return buildEmptyBooking();
     }
 
-    const guestFirstName = guestFirstNameFromApi(active.guest);
+    const guestFirstName = guestFirstNameFromApi(active);
     return toNormalizedBooking(arrival, departure, guestFirstName, checkoutTime, tz, now);
   } catch (error) {
     console.error("Lodgify API reservation fetch failed", error);
