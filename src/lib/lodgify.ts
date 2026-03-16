@@ -12,10 +12,14 @@ import { cleanWhitespace, toTitleCase } from "@/src/lib/formatters";
 
 const LODGIFY_API_BASE = "https://api.lodgify.com/v1";
 
-/** Lodgify API reservation item (guest, arrival, departure). API may use snake_case or camelCase. */
+/** Lodgify API reservation item. Handles v1 (arrival/departure) and v2 (check_in/check_out) shapes. */
 type LodgifyReservationItem = {
   arrival?: string;
   departure?: string;
+  check_in?: string;
+  check_out?: string;
+  checkIn?: string;
+  checkOut?: string;
   status?: string;
   guest?: {
     first_name?: string;
@@ -108,28 +112,35 @@ export async function getActiveBookingFromApi(
       return buildEmptyBooking();
     }
 
+    const getArrival = (r: LodgifyReservationItem) =>
+      parseLodgifyDate(r.arrival ?? r.check_in ?? r.checkIn);
+    const getDeparture = (r: LodgifyReservationItem) =>
+      parseLodgifyDate(r.departure ?? r.check_out ?? r.checkOut);
+
     const nowTime = now.getTime();
     const active = list
       .filter((r) => {
         const status = (r.status ?? "").toString();
         if (BLOCKED_STATUSES.some((s) => status.toLowerCase().includes(s.toLowerCase()))) return false;
-        const arrival = parseLodgifyDate(r.arrival);
-        const departure = parseLodgifyDate(r.departure);
+        const arrival = getArrival(r);
+        const departure = getDeparture(r);
         if (!arrival || !departure) return false;
-        return nowTime >= arrival.getTime() && nowTime < departure.getTime();
+        // Use end-of-checkout-day so guests still see their screen on checkout day
+        return nowTime >= arrival.getTime() && nowTime < departure.getTime() + 24 * 60 * 60 * 1000;
       })
       .sort((a, b) => {
-        const depA = parseLodgifyDate(a.departure)?.getTime() ?? 0;
-        const depB = parseLodgifyDate(b.departure)?.getTime() ?? 0;
+        const depA = getDeparture(a)?.getTime() ?? 0;
+        const depB = getDeparture(b)?.getTime() ?? 0;
         return depB - depA;
       })[0];
 
     if (!active) {
+      console.log("[Lodgify API] no active reservation found among", list.length, "items");
       return buildEmptyBooking();
     }
 
-    const arrival = parseLodgifyDate(active.arrival);
-    const departure = parseLodgifyDate(active.departure);
+    const arrival = getArrival(active);
+    const departure = getDeparture(active);
     if (!arrival || !departure) {
       return buildEmptyBooking();
     }

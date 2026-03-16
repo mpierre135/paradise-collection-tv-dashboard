@@ -31,7 +31,15 @@ export default async function UnitPage({ params }: UnitPageProps) {
   };
 
   if (!data.booking.isOccupied) {
-    return <VacancyScreen unit={data.unit} weather={data.weather} recommendations={data.recommendations} />;
+    return (
+      <VacancyScreen
+        unit={data.unit}
+        weather={data.weather}
+        recommendations={data.recommendations}
+        upsells={data.upsells}
+        qrById={data.qr.upsellById}
+      />
+    );
   }
 
   return (

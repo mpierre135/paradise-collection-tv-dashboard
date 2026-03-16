@@ -1,15 +1,18 @@
-import { WeatherSnapshot, Recommendation, UnitConfig } from "@/src/types";
+import { WeatherSnapshot, Recommendation, UnitConfig, Upsell } from "@/src/types";
 import { ClockDisplay } from "@/src/components/ClockDisplay";
 import { WeatherCard } from "@/src/components/WeatherCard";
 import { RecommendationsPanel } from "@/src/components/RecommendationsPanel";
+import { UpsellsPanel } from "@/src/components/UpsellsPanel";
 
 type VacancyScreenProps = {
   unit: UnitConfig;
   weather: WeatherSnapshot | null;
   recommendations: Recommendation[];
+  upsells: Upsell[];
+  qrById: Record<string, string | null>;
 };
 
-export function VacancyScreen({ unit, weather, recommendations }: VacancyScreenProps) {
+export function VacancyScreen({ unit, weather, recommendations, upsells, qrById }: VacancyScreenProps) {
   return (
     <main className="tv-safe relative min-h-screen overflow-hidden p-8 text-white md:p-12 lg:p-12">
       <div
@@ -49,6 +52,7 @@ export function VacancyScreen({ unit, weather, recommendations }: VacancyScreenP
           </div>
         </div>
 
+        <UpsellsPanel upsells={upsells} qrById={qrById} />
         <RecommendationsPanel recommendations={recommendations} />
 
         {(unit.instagramHandle || unit.directBookingUrl) ? (
