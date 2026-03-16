@@ -10,7 +10,7 @@ import { cleanWhitespace, toTitleCase } from "@/src/lib/formatters";
 
 // ─── Lodgify API (https://docs.lodgify.com/reference/reservations) ───
 
-const LODGIFY_API_BASE = "https://api.lodgify.com/v1";
+const LODGIFY_API_BASE = "https://api.lodgify.com/v2";
 
 /** Lodgify API reservation item. Handles v1 (arrival/departure) and v2 (check_in/check_out) shapes. */
 type LodgifyReservationItem = {
@@ -67,11 +67,13 @@ function guestFirstNameFromApi(reservation: LodgifyReservationItem): string | nu
     return first && first.length > 0 ? toTitleCase(first) : null;
   };
 
+  // v2 API uses top-level "guest_name" as a plain string
   return (
+    fromNameString(r.guest_name ?? r.guestName ?? r.contact_name) ??
     fromGuest(reservation.guest) ??
     fromGuest(r.primary_guest) ??
     fromGuest(Array.isArray(r.guests) ? r.guests[0] : null) ??
-    fromNameString(r.guest_name ?? r.guestName ?? r.contact_name ?? r.name)
+    fromNameString(r.name)
   );
 }
 
@@ -85,7 +87,7 @@ export async function getActiveBookingFromApi(
   const tz = resolveTimezone(timezone);
 
   try {
-    const url = new URL(`${LODGIFY_API_BASE}/reservation/reservations`);
+    const url = new URL(`${LODGIFY_API_BASE}/reservations/bookings`);
     url.searchParams.set("property_id", String(propertyId));
 
     const response = await fetch(url.toString(), {
