@@ -8,7 +8,7 @@ Production-ready Next.js MVP for TV-friendly guest welcome dashboards in short-t
   - `/tv/poinsettia-3br`
   - `/tv/poinsettia-2br`
   - `/tv/poinsettia-1br`
-- Lodgify iCal sync and defensive reservation parsing
+- Lodgify reservations via **API** (guest data) or **iCal** (calendar feed)
 - Active guest welcome and stay dates
 - Open-Meteo weather by unit coordinates
 - Dynamic checkout panel with live checkout-day countdown
@@ -34,7 +34,7 @@ Production-ready Next.js MVP for TV-friendly guest welcome dashboards in short-t
 
 - **Routes:** One dynamic route `app/tv/[unitSlug]/page.tsx`; `generateStaticParams` pre-renders the three unit slugs.
 - **Data flow:** For each request, `getDashboardDataBySlug(slug)` (in `src/lib/dashboard.ts`) loads the unit from `src/data/units.ts`, then in parallel:
-  - **Booking:** If `NEXT_PUBLIC_USE_MOCK_DATA` is true, uses `src/data/mockBookings.ts` (and mock weather); otherwise fetches the unit’s Lodgify iCal URL and parses it in `src/lib/lodgify.ts` to get the active reservation. Guest name is extracted from event summary/description; blocked/owner events are ignored.
+  - **Booking:** If `NEXT_PUBLIC_USE_MOCK_DATA` is true, uses `src/data/mockBookings.ts` (and mock weather). Otherwise, if `LODGIFY_API_KEY` is set and the unit has `lodgifyPropertyId`, the app uses the [Lodgify Reservations API](https://docs.lodgify.com/reference/reservations) for real guest data; if not, it falls back to the unit’s iCal URL (guest name parsed from event text). Blocked/owner events are ignored.
   - **Weather:** Mock mode returns a fixed snapshot; otherwise Open-Meteo is called with the unit’s lat/long in `src/lib/weather.ts`.
   - **Upsells & recommendations:** Filtered by unit’s `upsellIds` and `recommendationIds` from the single config file.
   - **QR codes:** Generated server-side for Wi-Fi, guide URL, and each upsell CTA via `src/lib/qr.ts`.
@@ -117,7 +117,7 @@ All operational content is in **`src/config/paradise-collection.config.ts`**. Ed
 
 | What to change | Where in config |
 |----------------|------------------|
-| **Lodgify iCal URLs** | `unitsConfig[].lodgifyIcalUrl` – replace placeholder URLs with real Lodgify calendar feeds |
+| **Lodgify** | Either set `LODGIFY_API_KEY` + `unitsConfig[].lodgifyPropertyId` (API, real guest names) or keep `lodgifyIcalUrl` (iCal feed) |
 | **Wi‑Fi** | `unitsConfig[].wifiName`, `unitsConfig[].wifiPassword` |
 | **House guide links** | `unitsConfig[].guideUrl` (used for QR and fallback text) |
 | **Checkout times** | `unitsConfig[].checkoutTime` – use 24h format, e.g. `"11:00"` |
@@ -131,7 +131,12 @@ All operational content is in **`src/config/paradise-collection.config.ts`**. Ed
 - Confirm `timezone` for each unit (defaults: `America/New_York`).
 - Do not edit `src/data/units.ts`, `src/data/upsells.ts`, or `src/data/recommendations.ts` for content changes; they re-export from the config.
 
-If iCal fetch/parsing fails, the app automatically falls back to a branded vacancy-safe state.
+If the API or iCal fetch fails, the app falls back to a branded vacancy-safe state.
+
+### Lodgify: API vs iCal
+
+- **API (recommended):** Set `LODGIFY_API_KEY` in your environment and add `lodgifyPropertyId` (numeric) to each unit in the config. The app will call `GET https://api.lodgify.com/v1/reservation/reservations?property_id=...` and use the reservation’s guest name and dates. Get your API key and property IDs from the Lodgify dashboard.
+- **iCal:** Leave `LODGIFY_API_KEY` unset (or omit `lodgifyPropertyId`). The app uses each unit’s `lodgifyIcalUrl` and parses guest name from the event summary/description.
 
 ## Editing Content
 
@@ -140,7 +145,7 @@ Edit **`src/config/paradise-collection.config.ts`** only.
 ### Units (`unitsConfig`)
 
 - Names, slugs, location, timezone
-- **Lodgify iCal URL**, **Wi‑Fi** (name/password), **guide URL**
+- **Lodgify:** either **API** (`lodgifyPropertyId` + env `LODGIFY_API_KEY`) or **iCal** (`lodgifyIcalUrl`). **Wi‑Fi** (name/password), **guide URL**
 - **Checkout time** (24h), **support phone** and **support text**
 - Quiet hours, parking reminder
 - **`upsellIds`** and **`recommendationIds`** (which upsells/recommendations this unit shows)
@@ -189,8 +194,8 @@ Before going live with real Lodgify and production content, replace the followin
 
 | Item | Where | What to do |
 |------|--------|------------|
-| **Lodgify iCal URLs** | `src/config/paradise-collection.config.ts` (`unitsConfig[].lodgifyIcalUrl`) | Replace any placeholder URLs with the real Lodgify iCal feed URL for each property/unit. |
-| **Disable mock data** | Environment (e.g. Vercel) | Set `NEXT_PUBLIC_USE_MOCK_DATA=false` so the app uses real iCal and live weather. |
+| **Lodgify** | Config + env | Either set `LODGIFY_API_KEY` and `lodgifyPropertyId` per unit (API) or keep real `lodgifyIcalUrl` (iCal). |
+| **Disable mock data** | Environment (e.g. Vercel) | Set `NEXT_PUBLIC_USE_MOCK_DATA=false` so the app uses real Lodgify and live weather. |
 | **Unit display names & property names** | Config: `unitsConfig[]` | Confirm `propertyName`, `displayName`, `city`, `state` for each unit. |
 | **Wi-Fi credentials** | Config: `unitsConfig[]` | Set real `wifiName` and `wifiPassword` per unit. |
 | **House guide URL** | Config: `unitsConfig[].guideUrl` | Replace with your real digital guide link per unit. |

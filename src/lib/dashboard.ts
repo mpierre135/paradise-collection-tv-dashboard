@@ -2,9 +2,9 @@ import { getMockBookings } from "@/src/data/mockBookings";
 import { recommendations } from "@/src/data/recommendations";
 import { units } from "@/src/data/units";
 import { upsells } from "@/src/data/upsells";
-import { isMockDataEnabled } from "@/src/lib/env";
+import { getLodgifyApiKey, isMockDataEnabled } from "@/src/lib/env";
 import { isoNow } from "@/src/lib/dates";
-import { getActiveBookingFromIcal, normalizeMockBooking } from "@/src/lib/lodgify";
+import { getActiveBookingFromApi, getActiveBookingFromIcal, normalizeMockBooking } from "@/src/lib/lodgify";
 import { buildWifiQrValue, generateQrDataUrl } from "@/src/lib/qr";
 import { fetchWeatherSnapshot, getMockWeatherSnapshot } from "@/src/lib/weather";
 import { UnitDashboardData } from "@/src/types";
@@ -25,9 +25,13 @@ export async function getDashboardDataBySlug(slug: string): Promise<DashboardWit
 
   const now = new Date();
 
+  const apiKey = getLodgifyApiKey();
+  const useApi = Boolean(apiKey && unit.lodgifyPropertyId != null);
   const bookingPromise = isMockDataEnabled()
     ? Promise.resolve(normalizeMockBooking(getMockBookings(now)[unit.id], unit.checkoutTime, unit.timezone, now))
-    : getActiveBookingFromIcal(unit.lodgifyIcalUrl, unit.checkoutTime, unit.timezone, now);
+    : useApi
+      ? getActiveBookingFromApi(unit.lodgifyPropertyId!, apiKey!, unit.checkoutTime, unit.timezone, now)
+      : getActiveBookingFromIcal(unit.lodgifyIcalUrl, unit.checkoutTime, unit.timezone, now);
 
   const weatherPromise = isMockDataEnabled()
     ? Promise.resolve(getMockWeatherSnapshot())

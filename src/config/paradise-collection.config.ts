@@ -2,7 +2,7 @@
  * Paradise Collection – single editable config
  *
  * Edit this file to update for all units:
- * - Lodgify iCal URLs (replace placeholder URLs with real Lodgify calendar feeds)
+ * - Lodgify: either set LODGIFY_API_KEY + lodgifyPropertyId per unit (API) or use lodgifyIcalUrl (iCal)
  * - Wi-Fi name and password per unit
  * - House guide links (QR code and fallback)
  * - Checkout times (24h format, e.g. "11:00")
@@ -28,6 +28,7 @@ export const unitsConfig: UnitConfig[] = [
     timezone: "America/New_York",
     latitude: 26.1224,
     longitude: -80.1373,
+    lodgifyPropertyId: 612248,
     lodgifyIcalUrl:
       "https://www.lodgify.com/3ef9451a-1b82-4c8f-a513-cd29dd2809e4.ics",
     wifiName: "Poinsettia Paradise 2.4Ghz ",
@@ -68,6 +69,7 @@ export const unitsConfig: UnitConfig[] = [
     timezone: "America/New_York",
     latitude: 26.1219,
     longitude: -80.1358,
+    lodgifyPropertyId: 504695,
     lodgifyIcalUrl:
       "https://www.lodgify.com/c0f79efe-5d7a-4592-9b94-deb4dbe26722.ics",
     wifiName: "Poinsettia Paradise 2.4Ghz ",
@@ -101,6 +103,7 @@ export const unitsConfig: UnitConfig[] = [
     timezone: "America/New_York",
     latitude: 26.1228,
     longitude: -80.1364,
+    lodgifyPropertyId: 504694,
     lodgifyIcalUrl:
       "https://www.lodgify.com/c0faf222-8ef2-4881-be06-2d9ffbeec849.ics",
     wifiName: "Poinsettia Paradise 2.4Ghz ",
