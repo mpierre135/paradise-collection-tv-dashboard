@@ -97,6 +97,9 @@ export async function getActiveBookingFromApi(
     }
 
     const body = (await response.json()) as LodgifyReservationsResponse | LodgifyReservationItem[];
+    // Log raw response shape to Vercel function logs so we can see exact field names
+    console.log("[Lodgify API] raw response keys:", JSON.stringify(Object.keys(body as object)));
+    console.log("[Lodgify API] raw body:", JSON.stringify(body).slice(0, 2000));
     const list = Array.isArray(body)
       ? body
       : (body.data ?? body.items ?? body.reservations ?? []);
@@ -132,6 +135,9 @@ export async function getActiveBookingFromApi(
     }
 
     const guestFirstName = guestFirstNameFromApi(active);
+    console.log("[Lodgify API] active reservation keys:", JSON.stringify(Object.keys(active)));
+    console.log("[Lodgify API] active.guest:", JSON.stringify(active.guest));
+    console.log("[Lodgify API] resolved guestFirstName:", guestFirstName);
     return toNormalizedBooking(arrival, departure, guestFirstName, checkoutTime, tz, now);
   } catch (error) {
     console.error("Lodgify API reservation fetch failed", error);
