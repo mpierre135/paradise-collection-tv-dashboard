@@ -31,7 +31,7 @@ export const unitsConfig: UnitConfig[] = [
     lodgifyPropertyId: 612248,
     lodgifyIcalUrl:
       "https://www.lodgify.com/3ef9451a-1b82-4c8f-a513-cd29dd2809e4.ics",
-    wifiName: "Poinsettia Paradise 2.4Ghz ",
+    wifiName: "Poinsettia Paradise 5GHz ",
     wifiPassword: "Paradise1400",
     guideUrl: "www.airbnb.com/s/guidebooks?refinement_paths%5B%5D=/guidebooks/3272653",
     checkoutTime: "11:00",
@@ -72,7 +72,7 @@ export const unitsConfig: UnitConfig[] = [
     lodgifyPropertyId: 504695,
     lodgifyIcalUrl:
       "https://www.lodgify.com/c0f79efe-5d7a-4592-9b94-deb4dbe26722.ics",
-    wifiName: "Poinsettia Paradise 2.4Ghz ",
+    wifiName: "Poinsettia Paradise 5GHz ",
     wifiPassword: "Paradise1400",
     guideUrl: "https://www.airbnb.com/s/guidebooks?refinement_paths%5B%5D=/guidebooks/3272653",
     checkoutTime: "11:00",
@@ -106,12 +106,12 @@ export const unitsConfig: UnitConfig[] = [
     lodgifyPropertyId: 504694,
     lodgifyIcalUrl:
       "https://www.lodgify.com/c0faf222-8ef2-4881-be06-2d9ffbeec849.ics",
-    wifiName: "Poinsettia Paradise 2.4Ghz ",
+    wifiName: "Poinsettia Paradise 5GHz ",
     wifiPassword: "Paradise1400",
     guideUrl: "https://www.airbnb.com/s/guidebooks?refinement_paths%5B%5D=/guidebooks/3272653",
     checkoutTime: "11:00",
-    supportPhone: "+1 (954) 555-0110",
-    supportText: "Need help? Call or text +1 (954) 555-0110",
+    supportPhone: "+1 (954) 669-1874",
+    supportText: "Need help? Call or text +1 (954) 669-1874",
     quietHours: "10:00 PM - 8:00 AM",
     parkingReminder: "Keep driveway clear for shared access.",
     upsellIds: ["late-checkout", "midstay-clean", "firewood", "luggage-storage"],
