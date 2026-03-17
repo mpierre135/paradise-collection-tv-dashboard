@@ -55,8 +55,7 @@ export async function getDashboardDataBySlug(slug: string): Promise<DashboardWit
 
   const selectedRecommendations = recommendations
     .filter((rec) => unit.recommendationIds.includes(rec.id))
-    .filter((rec) => rec.isFeatured)
-    .slice(0, 6);
+    .filter((rec) => rec.isFeatured);
 
   const mainUnit = slug !== MAIN_UNIT_SLUG ? units.find((u) => u.slug === MAIN_UNIT_SLUG) : null;
   const mainBookingPromise =
