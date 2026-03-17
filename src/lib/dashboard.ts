@@ -7,7 +7,11 @@ import { isoNow } from "@/src/lib/dates";
 import { getActiveBookingFromApi, getActiveBookingFromIcal, normalizeMockBooking } from "@/src/lib/lodgify";
 import { buildWifiQrValue, generateQrDataUrl } from "@/src/lib/qr";
 import { fetchWeatherSnapshot, getMockWeatherSnapshot } from "@/src/lib/weather";
+import type { NormalizedBooking } from "@/src/types";
 import { UnitDashboardData } from "@/src/types";
+
+/** When the three-bedroom (main unit) is occupied, its booking is shown on 1BR and 2BR screens. */
+const MAIN_UNIT_SLUG = "poinsettia-3br";
 
 export type DashboardWithQr = UnitDashboardData & {
   qr: {
@@ -17,6 +21,19 @@ export type DashboardWithQr = UnitDashboardData & {
   };
 };
 
+function getBookingForUnit(
+  unit: (typeof units)[number],
+  now: Date,
+  apiKey: string | undefined,
+  useApi: boolean
+): Promise<NormalizedBooking> {
+  return isMockDataEnabled()
+    ? Promise.resolve(normalizeMockBooking(getMockBookings(now)[unit.id], unit.checkoutTime, unit.timezone, now))
+    : useApi
+      ? getActiveBookingFromApi(unit.lodgifyPropertyId!, apiKey!, unit.checkoutTime, unit.timezone, now, unit.lodgifyRoomTypeId)
+      : getActiveBookingFromIcal(unit.lodgifyIcalUrl, unit.checkoutTime, unit.timezone, now);
+}
+
 export async function getDashboardDataBySlug(slug: string): Promise<DashboardWithQr | null> {
   const unit = units.find((candidate) => candidate.slug === slug);
   if (!unit) {
@@ -24,15 +41,10 @@ export async function getDashboardDataBySlug(slug: string): Promise<DashboardWit
   }
 
   const now = new Date();
-
   const apiKey = getLodgifyApiKey();
   const useApi = Boolean(apiKey && unit.lodgifyPropertyId != null);
-  const bookingPromise = isMockDataEnabled()
-    ? Promise.resolve(normalizeMockBooking(getMockBookings(now)[unit.id], unit.checkoutTime, unit.timezone, now))
-    : useApi
-      ? getActiveBookingFromApi(unit.lodgifyPropertyId!, apiKey!, unit.checkoutTime, unit.timezone, now, unit.lodgifyRoomTypeId)
-      : getActiveBookingFromIcal(unit.lodgifyIcalUrl, unit.checkoutTime, unit.timezone, now);
 
+  const bookingPromise = getBookingForUnit(unit, now, apiKey ?? undefined, useApi);
   const weatherPromise = isMockDataEnabled()
     ? Promise.resolve(getMockWeatherSnapshot())
     : fetchWeatherSnapshot(unit.latitude, unit.longitude);
@@ -46,7 +58,18 @@ export async function getDashboardDataBySlug(slug: string): Promise<DashboardWit
     .filter((rec) => rec.isFeatured)
     .slice(0, 6);
 
-  const [booking, weather] = await Promise.all([bookingPromise, weatherPromise]);
+  const mainUnit = slug !== MAIN_UNIT_SLUG ? units.find((u) => u.slug === MAIN_UNIT_SLUG) : null;
+  const mainBookingPromise =
+    mainUnit != null ? getBookingForUnit(mainUnit, now, apiKey ?? undefined, Boolean(apiKey && mainUnit.lodgifyPropertyId != null)) : null;
+
+  const [booking, weather, mainBooking] = await Promise.all([
+    bookingPromise,
+    weatherPromise,
+    mainBookingPromise ?? Promise.resolve(null)
+  ]);
+
+  const displayBooking =
+    mainUnit != null && mainBooking != null && mainBooking.isOccupied ? mainBooking : booking;
 
   const wifiQrPromise = generateQrDataUrl(buildWifiQrValue(unit.wifiName, unit.wifiPassword));
   const guideQrPromise = unit.guideUrl ? generateQrDataUrl(unit.guideUrl) : Promise.resolve(null);
@@ -66,7 +89,7 @@ export async function getDashboardDataBySlug(slug: string): Promise<DashboardWit
 
   return {
     unit,
-    booking,
+    booking: displayBooking,
     weather,
     upsells: selectedUpsells,
     recommendations: selectedRecommendations,
