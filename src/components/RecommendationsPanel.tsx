@@ -10,8 +10,11 @@ type RecommendationsPanelProps = {
 
 const VISIBLE_COUNT = 4;
 
+const isTuesday = () => new Date().getDay() === 2;
+
 export function RecommendationsPanel({ recommendations }: RecommendationsPanelProps) {
   const [offset, setOffset] = useState(0);
+  const showTuesdayPromo = isTuesday();
 
   useEffect(() => {
     if (recommendations.length <= VISIBLE_COUNT) {
@@ -59,6 +62,9 @@ export function RecommendationsPanel({ recommendations }: RecommendationsPanelPr
               </div>
               <h4 className="mt-1 text-2xl font-semibold text-white">{recommendation.name}</h4>
               <p className="mt-2 text-lg text-white/80">{recommendation.description}</p>
+              {showTuesdayPromo && recommendation.tuesdayPromo ? (
+                <p className="mt-2 text-base font-medium text-[#bfe0d8]">Today: {recommendation.tuesdayPromo}</p>
+              ) : null}
             </motion.article>
           ))}
         </AnimatePresence>

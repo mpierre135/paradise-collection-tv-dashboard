@@ -18,6 +18,8 @@ export type Recommendation = {
   description: string;
   distance?: string;
   mapsUrl?: string;
+  /** Shown on Tuesdays only (e.g. "All you can eat tacos", "All Movies $6"). */
+  tuesdayPromo?: string;
   isFeatured: boolean;
 };
 

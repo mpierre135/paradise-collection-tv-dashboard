@@ -45,8 +45,12 @@ export const unitsConfig: UnitConfig[] = [
       "fl-cafe-pr",
       "fl-breakfast-pr",
       "fl-dinner-pr",
+      "fl-dinner-bandoleros-pr",
       "fl-beach-pr",
       "fl-grocery-pr",
+      "fl-grocery-publix-pr",
+      "fl-photographer-chrisheadshots-pr",
+      "fl-movies-paradigm-pr",
       "fl-pharmacy-pr"
     ],
     theme: {
@@ -83,7 +87,17 @@ export const unitsConfig: UnitConfig[] = [
     quietHours: "10:00 PM - 8:00 AM",
     parkingReminder: "No street parking. Use assigned spots first.",
     upsellIds: ["late-checkout", "midstay-clean", "laundry-coins", "firewood", "luggage-storage", "extra-guest"],
-    recommendationIds: ["fl-cafe-pr", "fl-breakfast-pr", "fl-dinner-pr", "fl-beach-pr", "fl-grocery-pr"],
+    recommendationIds: [
+      "fl-cafe-pr",
+      "fl-breakfast-pr",
+      "fl-dinner-pr",
+      "fl-dinner-bandoleros-pr",
+      "fl-beach-pr",
+      "fl-grocery-pr",
+      "fl-grocery-publix-pr",
+      "fl-photographer-chrisheadshots-pr",
+      "fl-movies-paradigm-pr"
+    ],
     theme: {
       accentColor: "#9ED0B8",
       overlayGradient:
@@ -118,7 +132,16 @@ export const unitsConfig: UnitConfig[] = [
     quietHours: "10:00 PM - 8:00 AM",
     parkingReminder: "Keep driveway clear for shared access.",
     upsellIds: ["late-checkout", "midstay-clean", "firewood", "luggage-storage"],
-    recommendationIds: ["fl-cafe-pr", "fl-breakfast-pr", "fl-dinner-pr", "fl-beach-pr", "fl-pharmacy-pr"],
+    recommendationIds: [
+      "fl-cafe-pr",
+      "fl-breakfast-pr",
+      "fl-dinner-pr",
+      "fl-dinner-bandoleros-pr",
+      "fl-beach-pr",
+      "fl-photographer-chrisheadshots-pr",
+      "fl-movies-paradigm-pr",
+      "fl-pharmacy-pr"
+    ],
     theme: {
       accentColor: "#F2C48E",
       overlayGradient:
@@ -241,12 +264,48 @@ export const recommendationsConfig: Recommendation[] = [
     isFeatured: true
   },
   {
+    id: "fl-grocery-publix-pr",
+    category: "Grocery",
+    name: "Publix",
+    description: "Local supermarket for groceries, deli, and pharmacy.",
+    distance: "1.5 mi",
+    mapsUrl: "https://maps.google.com/?q=Publix+Fort+Lauderdale",
+    isFeatured: true
+  },
+  {
+    id: "fl-dinner-bandoleros-pr",
+    category: "Dinner",
+    name: "Bandoleros Tacos & Tequila Bar",
+    description: "Tacos, tequila, and lively atmosphere.",
+    distance: "2.0 mi",
+    mapsUrl: "https://maps.google.com/?q=Bandoleros+Tacos+Tequila+Bar+Fort+Lauderdale",
+    tuesdayPromo: "All you can eat tacos",
+    isFeatured: true
+  },
+  {
+    id: "fl-photographer-chrisheadshots-pr",
+    category: "Professional Photographer",
+    name: "Chris Headshots",
+    description: "Professional headshots and portraits. Book at new.chrisheadshots.com.",
+    mapsUrl: "http://new.chrisheadshots.com",
+    isFeatured: true
+  },
+  {
+    id: "fl-movies-paradigm-pr",
+    category: "Movie Theater",
+    name: "Paradigm Cinemas",
+    description: "Closest movie theater.",
+    mapsUrl: "https://paradigmcinemas.com/",
+    tuesdayPromo: "All Movies $6",
+    isFeatured: true
+  },
+  {
     id: "fl-pharmacy-pr",
     category: "Pharmacy",
-    name: "CVS on Sunrise",
+    name: "Walgreens on Sunrise",
     description: "Late-night essentials and prescriptions.",
     distance: "1.7 mi",
-    mapsUrl: "https://maps.google.com/?q=CVS+Sunrise+Boulevard+Fort+Lauderdale",
+    mapsUrl: "https://maps.google.com/?q=Walgreens+Sunrise+Boulevard+Fort+Lauderdale",
     isFeatured: false
   }
 ];
