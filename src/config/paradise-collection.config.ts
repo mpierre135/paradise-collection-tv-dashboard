@@ -29,7 +29,7 @@ export const unitsConfig: UnitConfig[] = [
     latitude: 26.1224,
     longitude: -80.1373,
     lodgifyPropertyId: 612248,
-    lodgifyRoomTypeId: 612248,
+    lodgifyRoomTypeId: 679101,
     lodgifyIcalUrl:
       "https://www.lodgify.com/3ef9451a-1b82-4c8f-a513-cd29dd2809e4.ics",
     wifiName: "Poinsettia Paradise 5GHz ",
@@ -141,7 +141,7 @@ export const upsellsConfig: Upsell[] = [
     description: "Enjoy a slower morning and extra time in paradise.",
     priceText: "$65",
     ctaLabel: "Request Late Checkout",
-    ctaUrl: "https://example.com/upsells/late-checkout",
+    ctaUrl: "https://buy.stripe.com/28E28qbfx15IdLvcyTfUQ04",
     isActive: true
   },
   {
@@ -150,7 +150,7 @@ export const upsellsConfig: Upsell[] = [
     description: "Professional housekeeping reset during your visit.",
     priceText: "$100",
     ctaLabel: "Schedule Cleaning",
-    ctaUrl: "https://example.com/upsells/midstay-clean",
+    ctaUrl: "https://buy.stripe.com/14A5kCerJ7u69vfbuPfUQ05",
     isActive: true
   },
   {
@@ -160,7 +160,7 @@ export const upsellsConfig: Upsell[] = [
     priceText: "$5 / $10",
     ctaLabel: "Pay with CashApp",
     // Replace with your CashApp payment link (e.g. https://cash.app/$YourCashtag) so the QR code opens your CashApp.
-    ctaQrValue: "https://cash.app/$YOUR_CASHTAG",
+    ctaQrValue: "https://cash.app/$mp1350",
     isActive: true
   },
   {
@@ -169,7 +169,7 @@ export const upsellsConfig: Upsell[] = [
     description: "Bundle of firewood delivered for your stay.",
     priceText: "$20",
     ctaLabel: "Request Firewood",
-    ctaUrl: "https://example.com/upsells/firewood",
+    ctaUrl: "https://buy.stripe.com/eVq00i6Zh29M7n7dCXfUQ06",
     isActive: true
   },
   {
@@ -178,7 +178,7 @@ export const upsellsConfig: Upsell[] = [
     description: "Store bags before check-in or after checkout.",
     priceText: "$25",
     ctaLabel: "Arrange Storage",
-    ctaUrl: "https://example.com/upsells/luggage-storage",
+    ctaUrl: "https://buy.stripe.com/00w00i0AT4hU36ReH1fUQ02",
     isActive: true
   },
   {
@@ -187,7 +187,7 @@ export const upsellsConfig: Upsell[] = [
     description: "Add an additional guest to your reservation.",
     priceText: "$50",
     ctaLabel: "Add Guest",
-    ctaUrl: "https://example.com/upsells/extra-guest",
+    ctaUrl: "https://buy.stripe.com/5kQ9AS1EX3dQbDn9mHfUQ03",
     isActive: true
   }
 ];
@@ -218,7 +218,7 @@ export const recommendationsConfig: Recommendation[] = [
     category: "Dinner",
     name: "Doc B's",
     description: "Local favorite for dinner.",
-    distance: "",
+    distance: "1.5 mi",
     mapsUrl: "https://maps.google.com/?q=Ad+Doc+Bs+Fort+Lauderdale",
     isFeatured: true
   },

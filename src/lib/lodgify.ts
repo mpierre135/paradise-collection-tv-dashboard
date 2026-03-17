@@ -24,6 +24,8 @@ type LodgifyReservationItem = {
   property_id?: number;
   room_type_id?: number;
   roomTypeId?: number;
+  /** v2 API nests room type inside rooms[0].room_type_id */
+  rooms?: Array<{ room_type_id?: number }>;
   guest?: {
     first_name?: string;
     last_name?: string;
@@ -117,8 +119,6 @@ export async function getActiveBookingFromApi(
     }
 
     const body = (await response.json()) as LodgifyReservationsResponse | LodgifyReservationItem[];
-    console.log("[Lodgify API] propertyId:", propertyId, "roomTypeId:", roomTypeId);
-    console.log("[Lodgify API] raw body:", JSON.stringify(body).slice(0, 3000));
 
     const list = Array.isArray(body)
       ? body
@@ -134,18 +134,26 @@ export async function getActiveBookingFromApi(
       parseLodgifyDate(r.departure ?? r.check_out ?? r.checkOut);
 
     const getRoomTypeId = (r: LodgifyReservationItem): number | undefined => {
-      const v = r.room_type_id ?? r.roomTypeId;
+      const nested = r.rooms?.[0]?.room_type_id;
+      const v = nested ?? r.room_type_id ?? r.roomTypeId;
+      return typeof v === "number" ? v : undefined;
+    };
+
+    const getPropertyId = (r: LodgifyReservationItem): number | undefined => {
+      const v = r.property_id;
       return typeof v === "number" ? v : undefined;
     };
 
     const nowTime = now.getTime();
     const active = list
       .filter((r) => {
-        // If we know the room type ID, only match bookings for this unit
-        if (roomTypeId !== undefined) {
-          const rid = getRoomTypeId(r);
-          if (rid !== undefined && rid !== roomTypeId) return false;
-        }
+        // Only show bookings for this unit: match by property_id or room_type_id from response
+        const respPropertyId = getPropertyId(r);
+        const respRoomTypeId = getRoomTypeId(r);
+        const matchesProperty = respPropertyId !== undefined && respPropertyId === propertyId;
+        const matchesRoomType = roomTypeId !== undefined && respRoomTypeId !== undefined && respRoomTypeId === roomTypeId;
+        if (!matchesProperty && !matchesRoomType) return false;
+
         const status = (r.status ?? "").toString();
         if (BLOCKED_STATUSES.some((s) => status.toLowerCase().includes(s.toLowerCase()))) return false;
         const arrival = getArrival(r);
@@ -160,19 +168,13 @@ export async function getActiveBookingFromApi(
         return depB - depA;
       })[0];
 
-    if (!active) {
-      console.log("[Lodgify API] no active reservation for propertyId:", propertyId, "roomTypeId:", roomTypeId, "total items:", list.length);
-      return buildEmptyBooking();
-    }
+    if (!active) return buildEmptyBooking();
 
     const arrival = getArrival(active);
     const departure = getDeparture(active);
     if (!arrival || !departure) return buildEmptyBooking();
 
     const guestFirstName = guestFirstNameFromApi(active);
-    console.log("[Lodgify API] active keys:", JSON.stringify(Object.keys(active)));
-    console.log("[Lodgify API] active.room_type_id:", active.room_type_id, "guest_name:", active.guest_name, "guest:", JSON.stringify(active.guest));
-    console.log("[Lodgify API] resolved guestFirstName:", guestFirstName);
     return toNormalizedBooking(arrival, departure, guestFirstName, checkoutTime, tz, now);
   } catch (error) {
     console.error("Lodgify API reservation fetch failed", error);

@@ -89,6 +89,7 @@ export function TVWelcomeScreen({
         >
           <div>
             <p className="text-sm uppercase tracking-[0.2em] text-white/75">The Paradise Collection</p>
+            <p className="mt-1 text-xl font-medium text-white/90">{unit.displayName}</p>
             <h1 className="mt-2 font-display text-6xl leading-tight text-white xl:text-7xl">Welcome to {unit.propertyName}</h1>
             <p className="mt-3 text-4xl text-white/95 xl:text-5xl">
               {booking.guestFirstName ? `Welcome, ${booking.guestFirstName}` : "Welcome to Paradise"}

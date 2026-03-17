@@ -27,6 +27,7 @@ export function VacancyScreen({ unit, weather, recommendations, upsells, qrById 
         <header className="flex items-start justify-between gap-6">
           <div>
             <p className="text-sm uppercase tracking-[0.2em] text-white/75">The Paradise Collection</p>
+            <p className="mt-1 text-xl font-medium text-white/90">{unit.displayName}</p>
             <h1 className="mt-2 max-w-4xl font-display text-6xl leading-tight text-white md:text-7xl">
               Welcome to {unit.propertyName}
             </h1>
